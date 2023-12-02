@@ -16,7 +16,7 @@ const (
 //var client = &http.Client{}
 
 func main() {
-	c1 := make(chan string) //vazio
+	c1 := make(chan string)
 	c2 := make(chan string)
 
 	go DoRequest(urlApiViaCep, c1)
@@ -41,7 +41,7 @@ func DoRequest(url string, channel chan string) {
 		log.Fatal(err)
 	}
 
-	response, err := http.DefaultClient.Do(request) //executa a request
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,9 +49,7 @@ func DoRequest(url string, channel chan string) {
 	defer response.Body.Close()
 	bodyBytes, _ := io.ReadAll(response.Body)
 
-	resp := string(bodyBytes) //convertendo pra string
+	resp := string(bodyBytes)
 	channel <- resp
 
 }
-
-// fazer as duas requiscoes, recuperar o dado e printar na tela
