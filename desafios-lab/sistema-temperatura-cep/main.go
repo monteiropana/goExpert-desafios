@@ -11,9 +11,10 @@ import (
 //API: protocolo/host/path/???query
 
 const (
-	urlApiWeatherAPI = "http://api.weatherapi.com/v1/current.json"
-
-	//concatena
+	urlApiWeatherAPI   = "http://api.weatherapi.com/v1/current.json?"
+	key                = "key=559686bddc72407cbe8173402242101"
+	query1             = "&q="
+	query2             = "&aqi=no"
 	urlApiViaCepPrefix = "https://viacep.com.br/ws/"
 	urlSulffix         = "/json/"
 
@@ -30,19 +31,32 @@ func main() {
 	if len(cep) != 8 {
 		panic("Invalid cep")
 	}
-	urlFinal := urlApiViaCepPrefix + cep + urlSulffix
-	GetCep(urlFinal)
+	urlCep := urlApiViaCepPrefix + cep + urlSulffix
+
+	response, _ := GetCep(urlCep)
+	urlWeather := urlApiWeatherAPI + key + query1 + response.Localidade + query2
+	GetWeather(urlWeather)
+
 }
 
 type ResponseWeatherAPI struct {
-	temp_c bool
-	temp_f bool
-	//temp_k bool
+	Current Current `json:"current"`
 }
 
+type Current struct {
+	TempC float64 `json:"temp_c"`
+	TempF float64 `json:"temp_f"`
+}
+
+// type ResponseWeatherAPI struct {
+// 	temp_c float32
+// 	temp_f float32
+// 	//temp_k bool
+// }
+
 type ResponseBody struct {
-	temp_c bool
-	temp_f bool
+	temp_c float32
+	temp_f float32
 	//temp_k bool
 }
 
@@ -73,10 +87,10 @@ func GetWeather(url string) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	var ObjectResponse ResponseWeatherAPI
-	json.Unmarshal(responseData, &ObjectResponse)
+	var objectResponse ResponseWeatherAPI
+	json.Unmarshal(responseData, &objectResponse)
 
-	fmt.Println("Response Body: ", ObjectResponse)
+	fmt.Println("Response Body: ", objectResponse)
 }
 
 func GetCep(url string) (ResponseCep, error) {
@@ -103,3 +117,6 @@ func GetCep(url string) (ResponseCep, error) {
 	return objectResponse, nil
 
 }
+
+//TODO: criar API e calcular o kelvin
+//TODO: response e request
