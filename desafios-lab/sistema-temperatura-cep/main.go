@@ -25,17 +25,8 @@ const (
 )
 
 func main() {
-	var cep string
-	fmt.Println("Digite um cep")
-	fmt.Scan(&cep)
-	if len(cep) != 8 {
-		panic("Invalid cep")
-	}
-	urlCep := urlApiViaCepPrefix + cep + urlSulffix
-
-	response, _ := GetCep(urlCep)
-	urlWeather := urlApiWeatherAPI + key + query1 + response.Localidade + query2
-	GetWeather(urlWeather)
+	http.HandleFunc("/clima", execute)
+	http.ListenAndServe(":8080", nil)
 
 }
 
@@ -115,8 +106,21 @@ func GetCep(url string) (ResponseCep, error) {
 	fmt.Println("Response Body: ", objectResponse)
 
 	return objectResponse, nil
+}
 
+func execute(w http.ResponseWriter, r *http.Request) {
+	var cep string
+	cep = "86047360"
+	if len(cep) != 8 {
+		panic("Invalid cep")
+	}
+	urlCep := urlApiViaCepPrefix + cep + urlSulffix
+
+	response, _ := GetCep(urlCep)
+	urlWeather := urlApiWeatherAPI + key + query1 + response.Localidade + query2
+	GetWeather(urlWeather)
 }
 
 //TODO: criar API e calcular o kelvin
-//TODO: response e request
+
+// retorno da requisicao api navegador
