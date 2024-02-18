@@ -1,11 +1,11 @@
 
-FROM golang:1.20
+FROM golang:1.21
 WORKDIR /app
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server
-ENTRYPOINT [ "/app/server" ] 
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o cloudrun
+ENTRYPOINT [ "/app/cloudrun" ] 
 
-#FROM golang:1.20 AS build 
+
 #FROM scratch 
-#COPY --from=build app/server /server
-#ENTRYPOINT [ "/server" ]
+#COPY --from=build /app/cloudrun .
+#ENTRYPOINT [ "./cloudrun" ]
