@@ -1,11 +1,11 @@
+
 FROM golang:1.20
-
 WORKDIR /app
-COPY go.mod ./
-COPY main.go ./
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server
+ENTRYPOINT [ "/app/server" ] 
 
-RUN go build -o /server
-
-EXPOSE 8080
-
-CMD [ "/server" ] 
+#FROM golang:1.20 AS build 
+#FROM scratch 
+#COPY --from=build app/server /server
+#ENTRYPOINT [ "/server" ]
