@@ -2,13 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 )
-
-//API: protocolo/host/path/???query
 
 const (
 	urlApiWeatherAPI   = "http://api.weatherapi.com/v1/current.json?"
@@ -17,18 +16,7 @@ const (
 	query2             = "&aqi=no"
 	urlApiViaCepPrefix = "https://viacep.com.br/ws/"
 	urlSulffix         = "/json/"
-
-	//replace
-	//urlReplace = "https://viacep.com.br/ws/CEP/json/"
-	// s := strings.Replace(urlReplace, "CEP", cep, 2)
-	// fmt.Println(s)
 )
-
-func main() {
-	http.HandleFunc("/clima", execute)
-	http.ListenAndServe(":8080", nil)
-
-}
 
 type ResponseWeatherAPI struct {
 	Current Current `json:"current"`
@@ -37,18 +25,7 @@ type ResponseWeatherAPI struct {
 type Current struct {
 	TempC float64 `json:"temp_c"`
 	TempF float64 `json:"temp_f"`
-}
-
-// type ResponseWeatherAPI struct {
-// 	temp_c float32
-// 	temp_f float32
-// 	//temp_k bool
-// }
-
-type ResponseBody struct {
-	temp_c float32
-	temp_f float32
-	//temp_k bool
+	TempK float64 `json:"temp_k"`
 }
 
 type ResponseCep struct {
@@ -62,7 +39,17 @@ type ResponseCep struct {
 	Logradouro  string
 }
 
-func GetWeather(url string) {
+type ResponseError struct {
+	Erro bool
+}
+
+func main() {
+	http.HandleFunc("/clima", execute)
+	http.ListenAndServe(":8080", nil)
+
+}
+
+func GetWeather(url string) ResponseWeatherAPI {
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -82,6 +69,8 @@ func GetWeather(url string) {
 	json.Unmarshal(responseData, &objectResponse)
 
 	fmt.Println("Response Body: ", objectResponse)
+
+	return objectResponse
 }
 
 func GetCep(url string) (ResponseCep, error) {
@@ -96,10 +85,19 @@ func GetCep(url string) (ResponseCep, error) {
 	}
 
 	defer response.Body.Close()
+
 	responseData, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Print(err.Error())
+		return ResponseCep{}, err
 	}
+
+	var objectResponseErr ResponseError
+	json.Unmarshal(responseData, &objectResponseErr)
+	if objectResponseErr.Erro {
+		return ResponseCep{}, errors.New("not found")
+	}
+
 	var objectResponse ResponseCep
 	json.Unmarshal(responseData, &objectResponse)
 
@@ -109,18 +107,27 @@ func GetCep(url string) (ResponseCep, error) {
 }
 
 func execute(w http.ResponseWriter, r *http.Request) {
-	var cep string
-	cep = "86047360"
+	v := r.URL.Query()
+	cep := v.Get("cep")
+
 	if len(cep) != 8 {
-		panic("Invalid cep")
+		http.Error(w, "invalid zipcode", 422)
+		return
 	}
+
 	urlCep := urlApiViaCepPrefix + cep + urlSulffix
 
-	response, _ := GetCep(urlCep)
+	response, err := GetCep(urlCep)
+	if err != nil {
+		http.Error(w, "cannot find zipcode", 404)
+		return
+	}
 	urlWeather := urlApiWeatherAPI + key + query1 + response.Localidade + query2
-	GetWeather(urlWeather)
+	res := GetWeather(urlWeather)
+	res.Current.TempK = res.Current.TempC + 273
+	res.Current.TempF = res.Current.TempC*1.8 + 32
+
+	returnWeather, _ := json.Marshal(res)
+	w.Write(returnWeather)
+
 }
-
-//TODO: criar API e calcular o kelvin
-
-// retorno da requisicao api navegador

@@ -1,8 +1,11 @@
 -Entrega:
 O código-fonte completo da implementação.
-Documentação explicando como rodar o projeto em ambiente dev e production.
-Testes automatizados demonstrando o funcionamento.
-Utilize docker/docker-compose para que possamos realizar os testes de sua aplicação.
-Deploy realizado no Google Cloud Run (free tier) e endereço ativo para ser acessado.
+Documentação explicando como rodar o projeto:
+passo 1: Baixe o repositorio 
+passo 2: Navegue até o pasta desafios-lab/sistema-temperatura-cep
+passo 3: digite o comando go run main.go
+passo 4: Abra o navegador e digite a seguinte URL: http://localhost:8080/clima?cep=(CEP)
+Teste: Digite um CEP Valido ex: 01153000
+Digite um cep com 8 digitos mas que seja um cep invalido
+Digite um Cep Inexistente
 
-apiKey: 559686bddc72407cbe8173402242101
