@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 )
 
 const (
@@ -122,10 +123,11 @@ func execute(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "cannot find zipcode", 404)
 		return
 	}
-	urlWeather := urlApiWeatherAPI + key + query1 + response.Localidade + query2
+	urlWeather := urlApiWeatherAPI + key + query1 + url.QueryEscape(response.Localidade) + query2
+
 	res := GetWeather(urlWeather)
 	res.Current.TempK = res.Current.TempC + 273
-	res.Current.TempF = res.Current.TempC*1.8 + 32
+	//res.Current.TempF = res.Current.TempC*1.8 + 32
 
 	returnWeather, _ := json.Marshal(res)
 	w.Write(returnWeather)
