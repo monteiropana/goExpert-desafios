@@ -44,17 +44,9 @@ type ResponseError struct {
 	Erro string
 }
 
-type ResponsePostCep struct {
-	TempC float64 `json:"temp_c"`
-	TempF float64 `json:"temp_f"`
-	TempK float64 `json:"temp_k"`
-	City  string  `json:"city"`
-}
-
 func main() {
 	http.HandleFunc("/clima", Execute)
 	http.ListenAndServe(":8080", nil)
-
 }
 
 func GetWeather(url string) ResponseWeatherAPI {
