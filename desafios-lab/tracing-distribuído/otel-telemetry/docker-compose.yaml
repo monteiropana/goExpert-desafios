@@ -1,0 +1,12 @@
+version: '3.0'
+
+services:
+     otel-collector:
+       image: otel/opentelemetry-collector-dev:latest
+       ports:
+         - 4317:4317
+         - 55680:55680
+     app:
+       build: .
+       ports:
+         - 8080:8080

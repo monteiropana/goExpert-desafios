@@ -20,13 +20,25 @@ const (
 )
 
 type ResponseWeatherAPI struct {
-	Current Current `json:"current"`
+	Current  Current  `json:"current"`
+	Location Location `json:"location"`
 }
 
 type Current struct {
 	TempC float64 `json:"temp_c"`
 	TempF float64 `json:"temp_f"`
 	TempK float64 `json:"temp_k"`
+}
+
+type ResponsePostCep struct {
+	City  string  `json:"city"`
+	TempC float64 `json:"temp_c"`
+	TempF float64 `json:"temp_f"`
+	TempK float64 `json:"temp_k"`
+}
+
+type Location struct {
+	Name string `json:"name"`
 }
 
 type ResponseCep struct {
@@ -127,7 +139,14 @@ func Execute(w http.ResponseWriter, r *http.Request) {
 	res := GetWeather(urlWeather)
 	res.Current.TempK = res.Current.TempC + 273
 
-	returnWeather, _ := json.Marshal(res)
+	objectResponse := ResponsePostCep{
+		City:  res.Location.Name,
+		TempC: res.Current.TempC,
+		TempF: res.Current.TempF,
+		TempK: res.Current.TempK + 273,
+	}
+
+	returnWeather, _ := json.Marshal(objectResponse)
 	w.Write(returnWeather)
 
 }
