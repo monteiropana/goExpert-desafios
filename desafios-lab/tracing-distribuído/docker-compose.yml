@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  servico-a:
+    container_name: servicoA
+    build: servico-A
+    ports:
+      - "8081:8081"
+    # tty: true
+    networks:
+      - servicos
+
+  servico-b:
+    container_name: servicoB
+    build: servico-B
+    ports:
+      - "8080:8080"
+    tty: true
+    networks:
+      - servicos
+
+
+networks:
+  servicos:
+    driver: bridge

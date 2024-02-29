@@ -58,7 +58,7 @@ type ResponseError struct {
 
 func main() {
 	http.HandleFunc("/clima", Execute)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe("0.0.0.0:8080", nil)
 }
 
 func GetWeather(url string) ResponseWeatherAPI {
