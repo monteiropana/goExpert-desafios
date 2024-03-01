@@ -9,17 +9,21 @@ services:
     # tty: true
     networks:
       - servicos
+    depends_on:
+      - servico-b
 
   servico-b:
     container_name: servicoB
     build: servico-B
     ports:
       - "8080:8080"
-    tty: true
+    # tty: true
     networks:
       - servicos
 
 
 networks:
   servicos:
-    driver: bridge
+    name: servicos
+    external: true
+    

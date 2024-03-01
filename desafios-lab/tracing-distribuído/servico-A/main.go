@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
 const (
-	urlServiceB = "http://localhost:8080/clima?cep="
+	urlServiceB = "http://172.29.0.3:8080/clima?cep="
 )
 
 type Cep struct {
@@ -41,22 +40,28 @@ func ExecutePost(w http.ResponseWriter, r *http.Request) {
 	request, err := http.NewRequest(http.MethodGet, urlServiceB+cep.Cep, nil)
 	if err != nil {
 		fmt.Print(err.Error())
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Print(err.Error())
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	defer response.Body.Close()
 	responseData, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Print(err.Error())
+		http.Error(w, err.Error(), 500)
 	}
 	var objResp ResponsePostCep
 	err = json.Unmarshal(responseData, &objResp)
 	if err != nil {
 		fmt.Print(err.Error())
+		http.Error(w, err.Error(), 500)
 	}
 	w.Write(responseData)
 }
