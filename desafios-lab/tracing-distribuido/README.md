@@ -1,7 +1,8 @@
 --Usado Image DockerFile + Docker-compose :
 
-Baixe o repositorio/Entre na pasta desafios/lab: sistema-temperatura-cep
+Baixe o repositorio/Entre na pasta desafios/lab: tracing-distribuido
 Para iniciar todos os serviços rode o comando: docker-compose up --build
+Utilize o Postman para consumir as APis:
 Digite um CEP Valido ex: 01153000
 
 Servico A: Passando o cep no body, a resposta é city + informacoes de clima
@@ -11,7 +12,6 @@ body: {
     }
 Servico B: Passando o cep no parametro a resposta é as informacoes do clima de dado cep
 - Metodo GET: http://localhost:8081/clima?cep=011530001
-Digite um CEP Valido ex: 01153000
 
 --Resultados de Tracing:
 
