@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -19,6 +18,7 @@ import (
 
 const (
 	urlServiceB = "http://servico-b:8081/clima?cep="
+	//urlServiceB = "http://localhost:8081/clima?cep="
 )
 
 type Cep struct {
@@ -54,12 +54,13 @@ func ExecutePost(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&cep)
 	if err != nil || len(cep.Cep) != 8 {
 		http.Error(w, "invalid zipcode", 422)
+		return
 	}
+
 	validateCEPSpan.End()
 	request, err := http.NewRequest(http.MethodGet, urlServiceB+cep.Cep, nil)
 	if err != nil {
-		fmt.Print(err.Error())
-		http.Error(w, err.Error(), 500)
+		http.Error(w, "erro na requisicao", 404)
 		return
 	}
 	_, span := otel.Tracer("servico-a").Start(context.Background(), "callServiceB")
@@ -67,22 +68,28 @@ func ExecutePost(w http.ResponseWriter, r *http.Request) {
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		fmt.Print(err.Error())
-		http.Error(w, err.Error(), 500)
+		http.Error(w, "cannot find zipcode", 404)
 		return
+
 	}
 
 	defer response.Body.Close()
 	responseData, err := io.ReadAll(response.Body)
 	if err != nil {
-		fmt.Print(err.Error())
-		http.Error(w, err.Error(), 500)
+		http.Error(w, "erro na leitura dos dados", 404)
+		return
+
 	}
+	if response.StatusCode != 200 {
+		http.Error(w, string(responseData), 404)
+		return
+	}
+
 	var objResp ResponsePostCep
 	err = json.Unmarshal(responseData, &objResp)
 	if err != nil {
-		fmt.Print(err.Error())
-		http.Error(w, err.Error(), 500)
+		http.Error(w, "erro de serialização", 404)
+		return
 	}
 	w.Write(responseData)
 }
