@@ -70,7 +70,6 @@ func ExecutePost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "cannot find zipcode", 404)
 		return
-
 	}
 
 	defer response.Body.Close()

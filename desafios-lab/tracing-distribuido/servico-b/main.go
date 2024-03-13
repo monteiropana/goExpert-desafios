@@ -62,7 +62,7 @@ type ResponseCep struct {
 }
 
 type ResponseError struct {
-	Erro string
+	Erro bool
 }
 
 func main() {
@@ -117,7 +117,7 @@ func GetCep(url string) (ResponseCep, error) {
 
 	var objectResponseErr ResponseError
 	json.Unmarshal(responseData, &objectResponseErr)
-	if objectResponseErr.Erro == "true" {
+	if objectResponseErr.Erro {
 		return ResponseCep{}, errors.New("not found")
 	}
 
